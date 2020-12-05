@@ -1,0 +1,49 @@
+# https://docs.docker.com/compose/compose-file
+version: "3.6"
+ 
+# https://docs.docker.com/compose/compose-file/#service-configuration-reference
+services:
+    web-yht-mg19:
+        image: udovicic/echo:apache-php7.2
+        links:
+        - "db"
+        - "redis"
+        ports:
+        - "8182:80"
+        volumes:
+        - ./docker/php/docker.ini:/etc/php/7.2/fpm/conf.d/docker.ini
+        - ./docker/xdebug.ini:/etc/php/7.2/mods-available/xdebug.ini
+        - ./html:/var/www/html
+        environment:
+        - TERM=xterm-256color
+        - APACHE_RUN_USER=1000
+    db:
+ 
+        # https://hub.docker.com/_/mysql/
+        image: mysql:5.7
+ 
+        volumes:
+        - ./docker/db/data:/var/lib/mysql
+ 
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+ 
+    redis:
+ 
+        # https://hub.docker.com/_/redis/
+        image: redis:latest
+ 
+    phpmyadmin:
+ 
+        # https://hub.docker.com/r/phpmyadmin/phpmyadmin/
+        image: phpmyadmin/phpmyadmin
+ 
+        ports:
+        - "8180:80"
+ 
+        environment:
+            MYSQL_USERNAME: ${MYSQL_ROOT_USERNAME}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
